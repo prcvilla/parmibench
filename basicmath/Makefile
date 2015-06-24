@@ -11,7 +11,7 @@ OBJS := parallel_basicmath
 all: $(OBJS)
 
 parallel_basicmath: $(FILE1) $(PARAMS)
-	$(CC) $(CFLAGS) $(FILE1) -o $@
+	$(CC) $(FILE1) -o $@ $(CFLAGS)
 
 $(PARAMS):
 	./gen_defs.sh $(PARAMS) $(PROCESSORS)
