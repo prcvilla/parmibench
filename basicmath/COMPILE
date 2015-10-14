@@ -4,6 +4,6 @@ Compile Instructions
 
 Clean Instructions
 ------------------
-1)  Type "make clean".  This will delete post-compile files (i.e.    
+1)  Type "make clean".  This will delete post-compile files (i.e.
     old executables, output, object files, etc...).
 

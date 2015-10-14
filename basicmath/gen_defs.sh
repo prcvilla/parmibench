@@ -1,1 +1,0 @@
-../scripts/gen_defs.sh

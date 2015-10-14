@@ -1,22 +1,16 @@
-PROCESSORS ?= 4
-
 CC := $(CROSS_COMPILE)gcc
-CFLAGS := -lpthread -lm -O2
+CFLAGS := -lpthread -lm
 
-PARAMS := params.h
-FILE1 = parallel_basicmath.c   rad2deg.c  cubic.c   isqrt.c
+SRCS = parallel_basicmath.c rad2deg.c cubic.c isqrt.c
 
 OBJS := parallel_basicmath
 
 all: $(OBJS)
 
-parallel_basicmath: $(FILE1) $(PARAMS)
-	$(CC) $(FILE1) -o $@ $(CFLAGS)
-
-$(PARAMS):
-	./gen_defs.sh $(PARAMS) $(PROCESSORS)
+parallel_basicmath: $(FILE1)
+	$(CC) $(SRCS) -o $@ $(CFLAGS)
 
 clean:
-	rm -rf $(OBJS) output* $(PARAMS)
+	rm -rf $(OBJS) output*
 
 .PHONY: all clean $(PARAMS)
