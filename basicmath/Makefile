@@ -1,16 +1,31 @@
-CC := $(CROSS_COMPILE)gcc
-CFLAGS := -lpthread -lm
+#
+#  Makefile
+#
 
-SRCS = parallel_basicmath.c rad2deg.c cubic.c isqrt.c
+#
+#  RTEMS_MAKEFILE_PATH is typically set in an environment variable
+#
 
-OBJS := parallel_basicmath
+PGM=${ARCH}/parallel_basicmath.exe
 
-all: $(OBJS)
+# optional managers required
+MANAGERS=all
 
-parallel_basicmath: $(FILE1)
-	$(CC) $(SRCS) -o $@ $(CFLAGS)
+# C source names
+CSRCS = rtems_basicmath.c cubic.c isqrt.c
+COBJS_ = $(CSRCS:.c=.o)
+COBJS = $(COBJS_:%=${ARCH}/%)
 
-clean:
-	rm -rf $(OBJS) output*
+include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
+include $(RTEMS_CUSTOM)
+include Makefile.local
+include $(PROJECT_ROOT)/make/leaf.cfg
 
-.PHONY: all clean $(PARAMS)
+OBJS= $(COBJS) $(CXXOBJS) $(ASOBJS)
+
+all:    ${ARCH} $(PGM)
+
+$(PGM): $(OBJS)
+	$(make-exe)
+
+

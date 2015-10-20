@@ -42,7 +42,7 @@ void SolveCubic(double  a,
 }
 
 #ifdef TEST
-
+#warning "TEST ENABLE!"
 int main(void)
 {
       double  a1 = 1.0, b1 = -10.5, c1 = 32.0, d1 = -30.0;
