@@ -6,7 +6,7 @@
 #  RTEMS_MAKEFILE_PATH is typically set in an environment variable
 #
 
-PGM=${ARCH}/parallel_basicmath.exe
+PGM=${ARCH}/rtems_basicmath.exe
 
 # optional managers required
 MANAGERS=all
@@ -18,7 +18,6 @@ COBJS = $(COBJS_:%=${ARCH}/%)
 
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
-include Makefile.local
 include $(PROJECT_ROOT)/make/leaf.cfg
 
 OBJS= $(COBJS) $(CXXOBJS) $(ASOBJS)

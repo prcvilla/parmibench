@@ -29,6 +29,7 @@
 
 pthread_attr_t string_attr;
 pthread_t workers[PROCESSORS];
+pthread_t system_alive;
 struct sched_param param;
 
 int math_operation;
@@ -61,13 +62,16 @@ static dlimit  _adlim,_bdlim,_cdlim,_ddlim,_adlimParams[PROCESSORS];  // double 
 void initializeLimits(void);
 void divide_into_sub_tasks(void);
 void *doWork(void*);
+void *alive(void*);
 
-void *POSIX_init(void) {
+void *POSIX_Init(void) {
 	int index;
 
 	math_operation=2;
 	no_workers=2;
 	data_set_type=1;
+
+	printf("Initiated....\n");
 
 	if (no_workers > PROCESSORS){
 		printf("ERROR: Number of worker should be no more than 8\n");
@@ -83,23 +87,41 @@ void *POSIX_init(void) {
 	pthread_attr_setschedpolicy(&string_attr, SCHED_FIFO);
 
 	for(index=0;index<no_workers;index++){
+		int *arg = malloc(sizeof(*arg));
+		*arg=index;
 		param.sched_priority = sched_get_priority_max(SCHED_FIFO) - index;
 		pthread_attr_setschedparam(&string_attr, &param);
-		if( pthread_create(&workers[index],&string_attr,doWork,(void *)(intptr_t)index) ||
+		if( pthread_create(&workers[index],&string_attr,doWork,arg) ||
 			pthread_setschedparam(workers[index], SCHED_FIFO, &param) ){
 			printf("error on creating worker %d...\n",index);
 			exit(1);
 		}
+		else{
+			printf("Worker %d created.\n",index);
+		}
+	}
+
+//	param.sched_priority = sched_get_priority_min(SCHED_FIFO);
+	param.sched_priority = sched_get_priority_max(SCHED_FIFO) - index;
+	pthread_attr_setschedparam(&string_attr, &param);
+	if( pthread_create(&system_alive,&string_attr,alive,NULL) ||
+		pthread_setschedparam(system_alive, SCHED_FIFO, &param) ){
+		printf("error on creating system_alive...\n");
+		exit(1);
+	}
+	else{
+		printf("system_alive created.\n",index);
 	}
 
 	for(index=0;index<no_workers;index++)
 		pthread_join(workers[index],NULL);
+	pthread_join(system_alive,NULL);
 
 	printf("Finished Working\n");
 	exit(0);
 }
 
-void intializeLimits(){
+void initializeLimits(void){
 	if (data_set_type==LARGE_DATA_SET){
 		//Initialization of integer type limits
 		_ilim._start=0;
@@ -228,10 +250,9 @@ void radianToDegConv(int workerID){
 }
 
 void *doWork(void *workerID){
-	int id = (intptr_t)workerID;
+	int id = *((int *) workerID);
 
-	if (PRINT)
-		printf("Worker %d started work.\n",id+1);  
+	printf("Worker %d started work.\n",id+1);  
 
 	//Each thread performs following five tasks according to assigned work.
 	if (math_operation ==CUBIC )
@@ -251,6 +272,13 @@ void *doWork(void *workerID){
 		printf("Worker %d has completed work.\n",id);
 
 	return NULL;
+}
+
+void *alive(void *unused){
+	while(1){
+		printf("Ticks since boot: %d\n", (int)rtems_clock_get_ticks_since_boot());
+		rtems_task_wake_after(200);
+	}
 }
 
 void divide_into_sub_tasks(){
@@ -307,7 +335,6 @@ void divide_into_sub_tasks(){
 #define CONFIGURE_MAXIMUM_POSIX_CONDITION_VARIABLES  10
 #define CONFIGURE_MAXIMUM_POSIX_MUTEXES              10
 #define CONFIGURE_POSIX_INIT_THREAD_TABLE
-#define CONFIGURE_POSIX_INIT_THREAD_ENTRY_POINT   "POSIX_Init"
 
 #define CONFIGURE_INIT
 

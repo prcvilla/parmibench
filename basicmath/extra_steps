@@ -1,0 +1,5 @@
+sparc-rtems-gcc --pipe -B/opt/rtems-4.11/sparc-rtems/leon3smp/lib/ -specs bsp_specs -qrtems   -Wall  -O2 -g -ffunction-sections -fdata-sections    -mcpu=leon3 -msoft-float -muser-mode      -Wl,--gc-sections   -mcpu=leon3 -msoft-float -muser-mode   -o o-optimize/rtems_basicmath.exe  o-optimize/rtems_basicmath.o o-optimize/cubic.o o-optimize/isqrt.o -lm
+sparc-rtems-nm -g -n o-optimize/rtems_basicmath.exe > o-optimize/rtems_basicmath.num
+sparc-rtems-size o-optimize/rtems_basicmath.exe
+cp o-optimize/rtems_basicmath.exe o-optimize/rtems_basicmath.ralf
+
